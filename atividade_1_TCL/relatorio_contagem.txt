@@ -1,0 +1,5 @@
+Relatório de contagem de células em netlist.v
+---------------------------------------------
+AND2: 11
+XOR2: 12
+flipflop_D: 4
