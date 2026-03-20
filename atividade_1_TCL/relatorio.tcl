@@ -1,32 +1,38 @@
-set filename "netlist.v"; #abrindo o arquivo
+# Arquivo Verilog
+set filename "netlist.v"
 
-set file [open $filename r]
-set content [read $file]
-close $file
+# Ler arquivo
+set fp [open $filename r]
+set content [read $fp]
+close $fp
 
-array set count_AND2 {}
-array set count_XOR2 {}
-array set count_fp_D {}
+# Contadores
+set and2 0
+set xor2 0
+set dff 0
 
-set lines [split $content "\n"]
-foreach line $lines {
-    if {[regexp {AND2} $line]} {
-        set count_AND2([lindex [split $line " "] 1]) [expr {$count_AND2([lindex [split $line " "] 1]) + 1}]
-    } elseif {[regexp {XOR2} $line]} {
-        set count_XOR2([lindex [split $line " "] 1]) [expr {$count_XOR2([lindex [split $line " "] 1]) + 1}]
-    } elseif {[regexp {fp_D} $line]} {
-        set count_fp_D([lindex [split $line " "] 1]) [expr {$count_fp_D([lindex [split $line " "] 1]) + 1}] 
+# Regex para instâncias
+set regex {^\s*(\w+)\s*(#\s*\(.*\))?\s+\w+\s*\(}
+
+# Percorrer linhas
+foreach line [split $content "\n"] {
+
+    if {[regexp $regex $line -> cell]} {
+
+        switch -- $cell {
+            "AND2"        { incr and2 }
+            "XOR2"        { incr xor2 }
+            "flipflop_D"  { incr dff }
+        }
     }
 }
-puts "Contagem de AND2:"
-foreach key [array names count_AND2] {
-    puts "$key: $count_AND2($key)"
-}   
-puts "Contagem de XOR2:"
-foreach key [array names count_XOR2] {
-    puts "$key: $count_XOR2($key)"
-}   
-puts "Contagem de fp_D:"
-foreach key [array names count_fp_D] {
-    puts "$key: $count_fp_D($key)"
-}  
+
+# Total
+set total [expr {$and2 + $xor2 + $dff}]
+
+# Relatório
+puts "\n=== Relatorio de instancias: ===\n"
+puts "AND2: $and2 instancias"
+puts "XOR2: $xor2 instancias"
+puts "flipflop_D: $dff instancias"
+puts "\nTOTAL: $total instancias\n"
