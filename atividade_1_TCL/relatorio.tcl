@@ -1,32 +1,38 @@
-set filename "netlist.v"; #abrindo o arquivo
+set filename "netlist.v"
+set reportFile "relatorio_contagem.txt"
 
-set file [open $filename r]
-set content [read $file]
-close $file
+set fd [open $filename r]
+set content [read $fd]
+close $fd
 
-array set count_AND2 {}
-array set count_XOR2 {}
-array set count_fp_D {}
+# iniciando as variaveis dos contadores
+set count_AND2 0
+set count_XOR2 0
+set count_flipflop_D 0
 
+# Percorrendo linha por linha para contar as portas logicas
 set lines [split $content "\n"]
 foreach line $lines {
-    if {[regexp {AND2} $line]} {
-        set count_AND2([lindex [split $line " "] 1]) [expr {$count_AND2([lindex [split $line " "] 1]) + 1}]
-    } elseif {[regexp {XOR2} $line]} {
-        set count_XOR2([lindex [split $line " "] 1]) [expr {$count_XOR2([lindex [split $line " "] 1]) + 1}]
-    } elseif {[regexp {fp_D} $line]} {
-        set count_fp_D([lindex [split $line " "] 1]) [expr {$count_fp_D([lindex [split $line " "] 1]) + 1}] 
+    if {[regexp {^\s*AND2\s+\w+\s*\(} $line]} {
+        incr count_AND2
+    } elseif {[regexp {^\s*XOR2\s+\w+\s*\(} $line]} {
+        incr count_XOR2
+    } elseif {[regexp {^\s*flipflop_D\s+\w+\s*\(} $line]} {
+        incr count_flipflop_D
     }
 }
-puts "Contagem de AND2:"
-foreach key [array names count_AND2] {
-    puts "$key: $count_AND2($key)"
-}   
-puts "Contagem de XOR2:"
-foreach key [array names count_XOR2] {
-    puts "$key: $count_XOR2($key)"
-}   
-puts "Contagem de fp_D:"
-foreach key [array names count_fp_D] {
-    puts "$key: $count_fp_D($key)"
-}  
+
+set report ""
+append report "Relatório de contagem de células em $filename\n"
+append report "---------------------------------------------\n"
+append report "AND2: $count_AND2\n"
+append report "XOR2: $count_XOR2\n"
+append report "flipflop_D: $count_flipflop_D\n"
+
+puts $report
+
+set out [open $reportFile w]
+puts -nonewline $out $report
+close $out
+
+puts "Arquivo de relatório gerado: $reportFile"
