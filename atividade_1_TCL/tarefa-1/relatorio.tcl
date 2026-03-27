@@ -1,38 +1,38 @@
+# Arquivo Verilog
 set filename "netlist.v"
-set reportFile "relatorio_contagem.txt"
 
-set fd [open $filename r]
-set content [read $fd]
-close $fd
+# Ler arquivo
+set fp [open $filename r]
+set content [read $fp]
+close $fp
 
-# iniciando as variaveis dos contadores
-set count_AND2 0
-set count_XOR2 0
-set count_flipflop_D 0
+# Contadores
+set and2 0
+set xor2 0
+set dff 0
 
-# Percorrendo linha por linha para contar as portas logicas
-set lines [split $content "\n"]
-foreach line $lines {
-    if {[regexp {^\s*AND2\s+\w+\s*\(} $line]} {
-        incr count_AND2
-    } elseif {[regexp {^\s*XOR2\s+\w+\s*\(} $line]} {
-        incr count_XOR2
-    } elseif {[regexp {^\s*flipflop_D\s+\w+\s*\(} $line]} {
-        incr count_flipflop_D
+# Regex para instâncias
+set regex {^\s*(\w+)\s*(#\s*\(.*\))?\s+\w+\s*\(}
+
+# Percorrer linhas
+foreach line [split $content "\n"] {
+
+    if {[regexp $regex $line -> cell]} {
+
+        switch -- $cell {
+            "AND2"        { incr and2 }
+            "XOR2"        { incr xor2 }
+            "flipflop_D"  { incr dff }
+        }
     }
 }
 
-set report ""
-append report "Relatório de contagem de células em $filename\n"
-append report "---------------------------------------------\n"
-append report "AND2: $count_AND2\n"
-append report "XOR2: $count_XOR2\n"
-append report "flipflop_D: $count_flipflop_D\n"
+# Total
+set total [expr {$and2 + $xor2 + $dff}]
 
-puts $report
-
-set out [open $reportFile w]
-puts -nonewline $out $report
-close $out
-
-puts "Arquivo de relatório gerado: $reportFile"
+# Relatório
+puts "\n=== Relatorio de instancias: ===\n"
+puts "AND2: $and2 instancias"
+puts "XOR2: $xor2 instancias"
+puts "flipflop_D: $dff instancias"
+puts "\nTOTAL: $total instancias\n"
