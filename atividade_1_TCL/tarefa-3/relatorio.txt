@@ -1,0 +1,22 @@
+=== TOP 10 NETS POR FANOUT ===
+rst: fanout = 4
+clk: fanout = 4
+w_carry1: fanout = 2
+w_carry2: fanout = 2
+count[0]: fanout = 2
+w11: fanout = 2
+A[0]: fanout = 2
+w2: fanout = 2
+Cin: fanout = 2
+w3: fanout = 2
+
+=== NETS COM FANOUT ZERO (POSSIVEIS ERROS) ===
+w10
+w1
+S[0]
+w4
+S[2]
+w7
+Cout
+S[1]
+S[3]
