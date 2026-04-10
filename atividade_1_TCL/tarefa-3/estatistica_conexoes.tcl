@@ -67,23 +67,30 @@ foreach nome [array names contagem_fanout] {
 # ordenar do maior pro menor
 set lista_ordenada [lsort -integer -decreasing -index 1 $lista_final]
 
-# printando
-puts "\n=== TOP 10 NETS POR FANOUT ==="
+# printando no arquivo relatorio.txt
+set relatorio [open "relatorio.txt" w]
+
+puts "Gerando relatório em relatorio.txt..."
+
+puts $relatorio "=== TOP 10 NETS POR FANOUT ==="
 set i 0
 foreach item $lista_ordenada {
     set nome [lindex $item 0]
     set valor [lindex $item 1]
     
     if {$valor > 0} {
-        puts "$nome: fanout = $valor"
+        puts $relatorio "$nome: fanout = $valor"
         incr i
     }
     if {$i == 10} { break }
 }
 
-puts "\n=== NETS COM FANOUT ZERO (POSSIVEIS ERROS) ==="
+puts $relatorio "\n=== NETS COM FANOUT ZERO (POSSIVEIS ERROS) ==="
 foreach item $lista_ordenada {
     if {[lindex $item 1] == 0} {
-        puts "[lindex $item 0]"
+        puts $relatorio "[lindex $item 0]"
     }
 }
+
+close $relatorio
+puts "Relatório gerado com sucesso!"
